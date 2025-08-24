@@ -37,7 +37,7 @@ jobs:
       - run: databricks bundle deploy
         working-directory: .
         env:
-          DATABRICKS_TOKEN: ${{ secrets.SP_TOKEN }}
+          DATABRICKS_TOKEN: ${{ secrets.StagePAT }}
           DATABRICKS_BUNDLE_ENV: stage
 
   # Validate, deploy, and then run the bundle.
@@ -61,5 +61,5 @@ jobs:
       - run: databricks bundle run taxi_processing_pipeline --refresh-all
         working-directory: .
         env:
-          DATABRICKS_TOKEN: ${{ secrets.SP_TOKEN }}
+          DATABRICKS_TOKEN: ${{ secrets.StagePAT }}
           DATABRICKS_BUNDLE_ENV: stage
