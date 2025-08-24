@@ -1,0 +1,18 @@
+# The main pipeline for my_project
+resources:
+  pipelines:
+    taxi_processing_pipeline:
+      name: ${var.unique_prefix}taxi_processing_pipeline
+      budget_policy_id: ${var.budget_policy_id} # Only set in prod
+      catalog: ${var.catalog}
+      schema: taxi_processing_${bundle.target}
+      serverless: true
+      libraries:
+        - notebook:
+            path: ../src/dlt_pipeline.ipynb
+        - notebook:
+            path: ../src/integration_tests.ipynb
+
+      configuration:
+        bundle.sourcePath: ${workspace.file_path}/src
+        target: ${bundle.target}

@@ -1,0 +1,58 @@
+# This is a Databricks asset bundle definition for my_project.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: taxi_processing_bundle
+  uuid: 39a65047-8753-4132-899d-bd3b1d25f1cd
+
+artifacts:
+  python_artifact:
+    type: whl
+    build: uv build --wheel
+
+include:
+  - resources/*.yml
+  - resources/*/*.yml
+
+variables:
+  catalog:
+    description: "The catalog where the schema will be created.  The same schema is used for the staging area as for the target tables"
+  budget_policy_id:
+    description: "The budget policy ID to use for the job. Only set in production."
+    default: ""
+  unique_prefix:
+    description: "A unique prefix to avoid name collisions in shared demo environments used for `prod`"
+    default: ""
+
+targets:
+  dev:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-984752964297111.11.azuredatabricks.net # field-eng-east Azure
+    variables:
+      catalog: dennis_schultz
+
+  stage:
+    mode: development
+    workspace:
+      host: https://adb-2338896885246877.17.azuredatabricks.net/ # fe-demo-westus Azure
+    variables:
+      catalog: dennis_schultz_staging
+
+  prod:
+    mode: production
+    workspace:
+      host: https://e2-demo-field-eng.cloud.databricks.com/ # e2-field-eng-west AWS
+      # We explicitly deploy to /Workspace/Users/dennis.schultz@databricks.com to make sure we only have a single copy.
+      root_path: /Workspace/Users/dennis.schultz@databricks.com/.bundle/${bundle.name}/${bundle.target}
+    permissions:
+      - user_name: dennis.schultz@databricks.com
+        level: CAN_MANAGE
+    variables:
+      unique_prefix: ${workspace.current_user.short_name}_
+      catalog: dennis_schultz
+      budget_policy_id: 2f54ec74-25e6-4ee4-83e1-d74f9957e7b3
