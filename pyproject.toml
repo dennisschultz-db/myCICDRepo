@@ -38,4 +38,4 @@ build-backend = "hatchling.build"
 packages = ["src/taxi_processing_pkg"]
 
 [project.scripts]
-main = "dennisschultz_cicd_project.main:main"
+main = "taxi_processing_pkg.main:main"
